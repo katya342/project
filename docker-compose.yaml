@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: workouts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+
+  backend:
+    build:
+      context: ./app-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./app-api:/var/www/html
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./app-front
+      dockerfile: Dockerfile
+    volumes:
+      - ./app-front:/app
+    ports:
+      - "3000:3000"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+   
+
+    depends_on:
+      - backend
+      - frontend
