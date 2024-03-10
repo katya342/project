@@ -13,22 +13,31 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import { CustomDialog } from '../CustomDialog';
 import { Alert } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../features/auth/authSlice';
 
 export default function SignIn() {
     const [isOpen, setIsOpen] = React.useState(false);
+
+
     const [responseData, setResponseData] = useState("");
+
     const [avatar, setAvatar] = useState("");
     const [alert, setAlertShow] = useState(false);
     const [alertSeverity, setAlertSeverity] = useState("");
-    const [alertMessage, setAlertMessage] = useState([]);
-    const [userData, setUserData] = useState({
-        email: '',
-        password: '',
-    });
+ 
+
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const {loading, error} = useSelector((state) => state.auth);
+
+
+
     const navigate = useNavigate();
 
     const handleDialogOpen = () => {
@@ -41,48 +50,30 @@ export default function SignIn() {
     };
 
 
-
     const handleSubmit = async (event) => {
         event.preventDefault();
-        try {
-            const response = await api.post('/authorize', userData);
-            const { token } = response.data;
-            console.log(response.data);
-            localStorage.setItem('avatar', response.data.avatar);
-            localStorage.setItem('user_token', token);
-            setAvatar(response.data.avatar);
-            setResponseData(response.data);
-            setIsOpen(true);
-        } catch (error) {
-            console.error('Authorization failed:', error);
-            setAlertShow(true);
-            setAlertSeverity("warning");
-            if (error.response && error.response.data && error.response.data.errors) {
-                const parsedErrors = Object.values(error.response.data.errors).flatMap(errorArray => errorArray);
-                setAlertMessage(parsedErrors);
-            } else if (error.response && error.response.data && error.response.data.message) {
-                setAlertMessage([error.response.data.message]);
-            } else {
-                setAlertMessage(["An unknown error occurred"]);
+        const userCredentials = {email, password}
+        dispatch(loginUser(userCredentials)).then((result) => {
+            if(result.payload)
+            {
+                setEmail('')
+                setPassword('')
+                navigate('/home')
             }
-        }
+        })
+       
     };
-
-
-    const handleChange = (e) => {
-        setUserData({ ...userData, [e.target.name]: e.target.value });
-    };
-
     return (
         <>
-            {alert && (
+            {/* {error && (
+               
                 <Alert
-                    severity={alertSeverity} onClose={() => { setAlertShow(false) }}
+                    severity="error" onClose={() => { setAlertShow(false) }}
                     sx={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}
                 >
-                    {alertMessage}
+                    {error}
                 </Alert>
-            )}
+            )} */}
             <ThemeProvider theme={createTheme()}>
                 <Container component="main" maxWidth="xs">
                     <CssBaseline />
@@ -102,8 +93,8 @@ export default function SignIn() {
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                             <TextField
-                                value={userData.email}
-                                onChange={handleChange}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 margin="normal"
                                 required
                                 fullWidth
@@ -114,8 +105,8 @@ export default function SignIn() {
                                 autoFocus
                             />
                             <TextField
-                                value={userData.password}
-                                onChange={handleChange}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 margin="normal"
                                 required
                                 fullWidth

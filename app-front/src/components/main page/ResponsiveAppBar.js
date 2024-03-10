@@ -26,6 +26,7 @@ import { BASE_URL } from '../constants';
 import { extractFileName } from '../utils/avatarUtils';
 import Notify from '../notifictations/Notifies';
 import api from '../../api';
+import { useSelector } from 'react-redux';
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -76,7 +77,7 @@ export default function NavBar() {
     const navigate = useNavigate();
     const isMenuOpen = Boolean(anchorElAccount);
     const isNotifyOpen = Boolean(anchorElNotify);
-
+   
     React.useEffect(() => {
         const storedAvatar = localStorage.getItem('avatar');
         if (storedAvatar) {
@@ -102,8 +103,8 @@ export default function NavBar() {
 
     const handleWorkoutsClick = () => {
         handleMenuClose();
-        const userToken = localStorage.getItem('user_token');
-        if (userToken == null) {
+        const token = localStorage.getItem("token")
+        if (token == null) {
             setIsOpen(true);
         }
         else {
@@ -113,8 +114,8 @@ export default function NavBar() {
 
     const handleMyAccountClick = () => {
         handleMenuClose();
-        const userToken = localStorage.getItem('user_token');
-        if (userToken == null) {
+        const token = localStorage.getItem("token")
+        if (token == null) {
             setIsOpen(true);
         }
         else {

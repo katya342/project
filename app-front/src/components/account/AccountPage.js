@@ -9,6 +9,7 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EditIcon from '@mui/icons-material/Edit'
 import { CustomDialog } from '../CustomDialog';
 import SubsComponent from '../subscriptions/SubsComponent';
+import { useSelector } from 'react-redux';
 
 
 export default function AccountPage () {
@@ -19,13 +20,18 @@ export default function AccountPage () {
   const [msg, setMsg] = useState("");
   const handleDialogOpen = () => { setIsOpen(true) };
   const handleDialogClose = () => { setIsOpen(false); navigate('/home') };
-
+  const token = localStorage.getItem("token")
   const navigate = useNavigate();
 
   useEffect(() => {
-
-    api.get('/user/data')
+    if (!token) return;
+    api.get('/user/data', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
       .then(response => {
+        console.log(response.data)
         setUserData(response.data);
       })
       .catch(error => {
@@ -69,7 +75,7 @@ export default function AccountPage () {
 
 
 
-  if (!userData || loading) {
+  if (!userData || loading || !token) {
     return (
       <Container>
         {error}

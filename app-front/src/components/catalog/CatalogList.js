@@ -21,7 +21,7 @@ export default function TitlebarImageList() {
         const fetchData = async () => {
             const response = await api.get('/catalog');
             setCatalogData(response.data.data);
-            console.log(response.data.data);
+            // console.log(response.data.data);
         }
         fetchData()
     }, [])

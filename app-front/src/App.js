@@ -10,32 +10,36 @@ import SignUp from './components/Registration&Authentication/SignUp';
 import { Box } from '@mui/material';
 import Workouts from './components/catalog/WorkoutDetails';
 
+
 function App() {
 
 
   return (
     <>
-      <Box className='App'>
-        <Router>
-          <Routes>
-            <Route
-              path="/"
-              element={<Navigate to="/home" />}
-            />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/account" element={<AccountPage />} />
-            <Route path='/register' element={<SignUp />}></Route>
-            <Route
-              path='/login'
-              element={<SignIn />}
-            />
-            <Route path='/plans/:planId' element={<PlansComp />}></Route>
-            <Route path='/workout/details/:catalogId' element={<Workouts/>}></Route>
-            <Route path='/user/workouts' element={<UserWorkouts/>}></Route>
-          </Routes>
-        </Router>
+    
+        <Box className='App'>
+          <Router>
+            <Routes>
+              <Route
+                path="/"
+                element={<Navigate to="/home" />}
+              />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/account" element={<AccountPage />} />
+              <Route path='/register' element={<SignUp />}></Route>
+              <Route
+                path='/login'
+                element={<SignIn />}
+              />
+              <Route path='/plans/:planId' element={<PlansComp />}></Route>
+              <Route path='/workout/details/:catalogId' element={<Workouts />}></Route>
+              <Route path='/user/workouts' element={<UserWorkouts />}></Route>
+            </Routes>
+          </Router>
 
-      </Box>
+        </Box>
+     
+
 
     </>
 
