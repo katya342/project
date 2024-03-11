@@ -64,6 +64,7 @@ Route::middleware(['cors', 'auth:sanctum'])->group(function () {
 });
 
 Route::middleware(['cors'])->group(function () {
+    Route::get('/plans/{id}', [PaymentController::class, 'getPlan']);
     Route::get('/get-workout/{catalogId}', [WorkoutController::class,'findWorkoutsByCatalogId']);
     Route::get('/feedbacks/{planId}', [CommentController::class, 'getFeedbacks']);
     Route::get('/catalog', [CatalogController::class, 'getCatalog']);

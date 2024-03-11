@@ -15,40 +15,23 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { CustomDialog } from '../CustomDialog';
-import { Alert } from '@mui/material';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../features/auth/authSlice';
 
 export default function SignIn() {
     const [isOpen, setIsOpen] = React.useState(false);
-
-
-    const [responseData, setResponseData] = useState("");
-
-    const [avatar, setAvatar] = useState("");
-    const [alert, setAlertShow] = useState(false);
-    const [alertSeverity, setAlertSeverity] = useState("");
  
-
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const {loading, error} = useSelector((state) => state.auth);
-
-
-
     const navigate = useNavigate();
-
-    const handleDialogOpen = () => {
-        setIsOpen(true);
-    };
-
+ 
     const handleDialogClose = () => {
         setIsOpen(false);
-        navigate('/home');
-    };
 
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -56,24 +39,21 @@ export default function SignIn() {
         dispatch(loginUser(userCredentials)).then((result) => {
             if(result.payload)
             {
+               
                 setEmail('')
                 setPassword('')
                 navigate('/home')
+              
             }
+            else {
+                setIsOpen(true)
+            }
+           
         })
        
     };
     return (
         <>
-            {/* {error && (
-               
-                <Alert
-                    severity="error" onClose={() => { setAlertShow(false) }}
-                    sx={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}
-                >
-                    {error}
-                </Alert>
-            )} */}
             <ThemeProvider theme={createTheme()}>
                 <Container component="main" maxWidth="xs">
                     <CssBaseline />
@@ -144,8 +124,8 @@ export default function SignIn() {
                     </Box>
                 </Container>
             </ThemeProvider>
-            <CustomDialog isOpen={isOpen} title='Successfully authorized' handleClose={handleDialogClose}>
-                <p>{responseData.message}</p>
+            <CustomDialog isOpen={isOpen} title="Error" handleClose={handleDialogClose}>
+                <p>{error}</p>
             </CustomDialog>
         </>
     );

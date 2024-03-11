@@ -16,7 +16,7 @@ export default function FeedBack (props) {
     const [alertSeverity, setAlertSeverity] = useState("");
     const [alertMessage, setAlertMessage] = useState("");
     const [isHovered, setIsHovered] = useState(false); 
-
+  
     const fetchData = async () => {
         try {
             const response = await api.get(`feedbacks/${props.planId}`);
@@ -44,6 +44,7 @@ export default function FeedBack (props) {
     const handleAddComment = async () => {
         try {
             await api.post(`/add/feedback/${props.planId}/${props.trainerId}`, {
+                
                 comment: inputValue,
                 rating: value
             });
@@ -93,7 +94,7 @@ export default function FeedBack (props) {
                     <Typography>{item.comment}</Typography>
                     <Typography variant="caption">Rating: <Rating name="read-only" size="small" value={item.rating} readOnly /></Typography>
                     <Typography>Posted on: {formatDate(item.created_at)}</Typography>
-                    {localStorage.getItem('user_token') === item.user.remember_token && (
+                    {localStorage.getItem('token') === item.user.remember_token && (
                         <ClearIcon 
                             color={isHovered ? "primary" : "disabled"} 
                             sx={{ position: 'absolute', top: 5, right: 5, cursor: 'pointer' }} 

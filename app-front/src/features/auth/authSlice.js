@@ -35,9 +35,10 @@ const authSlice = createSlice({
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = true;
-            console.log(action.error.message);
-            state.error = action.error.message;
-            state.user = null
+            // console.log(action.error.message);
+            // state.error = action.error.message;
+            state.error = "Invalid credentials";
+            state.user = null;
         })
     }
 })

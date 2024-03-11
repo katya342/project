@@ -17,7 +17,8 @@ import api from '../../api';
 import { useNavigate } from "react-router-dom";
 import { CustomDialog } from '../CustomDialog';
 import { BASE_URL } from '../constants';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../../features/register/registerSlice';
 const style = {
     position: 'absolute',
     top: '50%',
@@ -46,14 +47,8 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-    const [isOpen, setIsOpen] = React.useState(false);
-    const handleDialogOpen = () => {
-        setIsOpen(true);
-    };
-    const handleDialogClose = () => {
-        setIsOpen(false);
-        navigate('/home');
-    };
+    const dispatch = useDispatch();
+    const { error, loading } = useSelector(state => state.register);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -70,31 +65,19 @@ export default function SignUp() {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formDataToSend = new FormData();
+        formDataToSend.append('name', formData.name);
+        formDataToSend.append('email', formData.email);
+        formDataToSend.append('password', formData.password);
+        formDataToSend.append('avatar', formData.avatar);
+        localStorage.setItem('avatar', formData.avatar.name);
+        dispatch(registerUser(formDataToSend)).then((result) => {
+            console.log(loading)
+            if (result.payload) {
+                navigate('/home')
+            }
+        })
 
-        try {
-            const formDataToSend = new FormData();
-            formDataToSend.append('name', formData.name);
-            formDataToSend.append('email', formData.email);
-            formDataToSend.append('password', formData.password);
-            formDataToSend.append('avatar', formData.avatar);
-
-            const response = await api.post('/register', formDataToSend, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-
-            const { token } = response.data;
-            localStorage.setItem('user_token', token);
-            localStorage.setItem('avatar', formData.avatar.name);
-
-            console.log(response);
-            setIsOpen(true);
-
-
-
-        } catch (error) {
-            setIsOpen(true);
-            console.error('Registration error:', error.response.data.message);
-        }
     };
     return (
         <Box>
@@ -189,9 +172,9 @@ export default function SignUp() {
                     <Copyright sx={{ mt: 5 }} />
                 </Container>
             </ThemeProvider>
-            <CustomDialog isOpen={isOpen} handleClose={handleDialogClose} title='Success'>
+            {/* <CustomDialog isOpen={isOpen} handleClose={handleDialogClose} title='Success'>
                 <Typography>User successfully registrated</Typography>
-            </CustomDialog>
+            </CustomDialog> */}
 
         </Box>
 

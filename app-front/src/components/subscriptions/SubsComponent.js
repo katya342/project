@@ -1,37 +1,61 @@
 import { useState, useEffect } from "react";
 import api from "../../api";
 
-import {Box, Typography} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 const SubsComponent = () => {
-    const [subData, setSubData] = useState([]);
+    const [activeSubData, setActiveSubData] = useState([]);
     const [unactiveSubData, setUnactiveSubData] = useState([]);
     const [activeCounter, setActiveCounter] = useState(0);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await api.get('/user/active-subs');
-                if (Array.isArray(response.data.success)) {
-                    setSubData(response.data.success);
-                    const counter = response.data.success.reduce((acc, sub) => acc + (sub.active ? 1 : 0), 0);
-                    setActiveCounter(counter);
-                    const secondResponse = api.get('/user/unactive-subs');
-                    setUnactiveSubData(secondResponse);
-                } else {
-                    console.error('Invalid data format:', response.data);
-                }
-            } catch (error) {
-                console.error('Error fetching active subscriptions:', error);
-            }
-        };
     
+    const handleUnsubscribe = async(subId) => {
+        try {
+            await api.post(`/user/unsubscribe/${subId}`);
+            // После отмены подписки обновляем данные
+            fetchData();
+        } catch (error) {
+            console.error('Error unsubscribing:', error);
+        }
+    }
+    // const fetchPlanData = async()
+    const fetchData = async () => {
+        try {
+            const activeResponse = await api.get('/user/active-subs');
+            setActiveSubData(activeResponse.data.success);
+            const activeCounter = activeResponse.data.success.filter(sub => sub.active).length;
+            setActiveCounter(activeCounter);
+
+            const unactiveResponse = await api.get('/user/unactive-subs');
+            setUnactiveSubData(unactiveResponse.data.success);
+        } catch (error) {
+            console.error('Error fetching subscriptions:', error);
+        }
+    };
+    
+    useEffect(() => {
         fetchData();
     }, []);
     
-
     return (
         <Box>
             <Typography>Activated subscription count: {activeCounter}</Typography>
+            <Typography>Active Subscriptions:</Typography>
+            <ul>
+                {activeSubData.map(sub => (
+                    <li key={sub.id}>
+                        Plan ID: {sub.plan_id}, Expires at: {sub.expires_at}
+                        <Button onClick={() => handleUnsubscribe(sub.id)}>Cancel subscription</Button>
+                    </li>
+                ))}
+            </ul>
+            <Typography>Inactive Subscriptions:</Typography>
+            <ul>
+                {unactiveSubData.map(sub => (
+                    <li key={sub.id}>
+                        Plan ID: {sub.plan_id}, Expires at: {sub.expires_at}
+                    </li>
+                ))}
+            </ul>
         </Box>
     );
 };

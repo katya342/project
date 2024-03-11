@@ -11,31 +11,34 @@ class PaymentController extends Controller
     public function subscribe(Request $request, $planId)
     {
         $plan = Plan::find($planId);
-        if(!$plan)
-        {
+        if(!$plan) {
             return response()->json(['error' => 'Plan not found'], 404);
         }
         $user = $request->user();
-        if(!$user)
-        {
+        if(!$user) {
             return response()->json(['error' => 'User not found']);
         }
-
-        if ($user->subscriptions()->where('plan_id', $planId)->exists()) {
-            return response()->json(['error' => 'Already subscribed to this plan'], 400);
+    
+        // Проверяем, есть ли уже активная подписка на этот план
+        $existingSubscription = $user->subscriptions()->where('plan_id', $planId)->where('active', 1)->first();
+        if ($existingSubscription) {
+            // Отменяем существующую подписку
+            $existingSubscription->update(['active' => 0]);
         }
+    
+        // Создаем новую подписку
         $duration = $plan->duration_month;
         $subscription = new Subscription([
             'user_id' => $user->id,
             'plan_id' => $planId,
             'expires_at' => now()->addMonth(),
-            'active' => true,
-
+            'active' => 1,
         ]);
-
+    
         $subscription->save();
         return response()->json(['success' => true, 'message' => 'Subscription successful']);
     }
+    
     public function deleteSubscribe($id) 
     {
         try{
@@ -79,6 +82,11 @@ class PaymentController extends Controller
     {
         $plans = Plan::all();
         return response()->json(['All plans: ' => $plans]);
+    }
+    public function getPlan($id)
+    {
+        $plan = Plan::findOrFail($id);
+        return response()->json(['Plan'=> $plan]);
     }
     
     // public function getPlan
